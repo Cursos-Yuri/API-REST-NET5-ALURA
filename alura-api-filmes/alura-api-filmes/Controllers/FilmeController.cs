@@ -12,9 +12,7 @@ namespace alura_api_filmes.Controllers
         private static List<Filme> filmes = new List<Filme>();
 
         public FilmeController()
-        {
-
-        }
+        { }
 
         [HttpPost]
         public IActionResult CreateFilme([FromBody] Filme filme) 
