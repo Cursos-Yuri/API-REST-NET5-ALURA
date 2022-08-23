@@ -1,7 +1,11 @@
-﻿using alura_api_filmes.Models;
+﻿using alura_api_filmes.Data;
+using alura_api_filmes.Data.DTOs;
+using alura_api_filmes.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace alura_api_filmes.Controllers
 {
@@ -9,36 +13,42 @@ namespace alura_api_filmes.Controllers
     [Route("[controller]")]
     public class FilmeController : ControllerBase
     {
-        private static List<Filme> filmes = new List<Filme>();
-
-        public FilmeController()
-        { }
+        private FilmeContext _context;
+        private IMapper _mapper;
+        public FilmeController(FilmeContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
 
         [HttpPost]
-        public IActionResult CreateFilme([FromBody] Filme filme) 
+        public IActionResult CreateFilme([FromBody] CreateFilmeDTO filmedto)
         {
             try
             {
-                filmes.Add(filme);
+                Filme filme = _mapper.Map<Filme>(filmedto);
+
+                _context.Filme.Add(filme);
+                _context.SaveChanges();
 
                 return CreatedAtAction(nameof(GetFilmePerId), new { Id = filme.Id }, filme);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(new { ex.Message });
             }
         }
 
         [HttpGet]
-        public IActionResult GetFilmes() 
+        public IEnumerable<Filme> GetFilmes()
         {
             try
             {
-                return Ok();
+                return _context.Filme;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return BadRequest(new { ex.Message });
+                return null;
             }
         }
 
@@ -47,12 +57,44 @@ namespace alura_api_filmes.Controllers
         {
             try
             {
-                return Ok();
+                Filme filme = _context.Filme.FirstOrDefault(x => x.Id == id);
+
+                ReadFilmeDTO filmeDto = _mapper.Map<ReadFilmeDTO>(filme);
+
+                return Ok(filme);
             }
             catch (Exception ex)
             {
                 return BadRequest(new { ex.Message });
             }
         }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateFilme(int id, [FromBody] UpdateFilmeDTO filmeDTO)
+        {
+            Filme filme = _context.Filme.FirstOrDefault(x => x.Id == id);
+
+            if (filme.Equals(null)) return NotFound();
+
+            _mapper.Map(filmeDTO, filme);
+
+            _context.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteFilme(int id)
+        {
+            Filme filme = _context.Filme.FirstOrDefault(x => x.Id == id);
+
+            if (filme.Equals(null)) return NotFound();
+
+            _context.Remove(filme);
+            _context.SaveChanges();
+
+            return NoContent();
+        }
+
     }
 }

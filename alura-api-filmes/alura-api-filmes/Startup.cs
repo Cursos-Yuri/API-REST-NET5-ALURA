@@ -29,6 +29,8 @@ namespace alura_api_filmes
         {
             services.AddDbContext<FilmeContext>(opts => opts.UseSqlServer(Configuration.GetConnectionString("SQL_CONNECTION")));
             services.AddControllers();
+
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
