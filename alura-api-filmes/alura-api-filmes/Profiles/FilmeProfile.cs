@@ -10,7 +10,7 @@ namespace alura_api_filmes.Profiles
         {
             CreateMap<CreateFilmeDTO, Filme>();
             CreateMap<Filme, ReadFilmeDTO>();
-            CreateMap<UpdateFilmeDTO, Filme>();
+            CreateMap<UpdateEnderecoDTO, Filme>();
         }
     }
 }

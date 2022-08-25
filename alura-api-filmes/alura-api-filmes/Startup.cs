@@ -28,6 +28,7 @@ namespace alura_api_filmes
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<FilmeContext>(opts => opts.UseSqlServer(Configuration.GetConnectionString("SQL_CONNECTION")));
+            services.AddDbContext<FilmeContext>(opts => opts.UseSqlServer(Configuration.GetConnectionString("SQL_CONNECTION")));
             services.AddControllers();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

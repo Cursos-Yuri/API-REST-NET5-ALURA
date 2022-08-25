@@ -70,7 +70,7 @@ namespace alura_api_filmes.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateFilme(int id, [FromBody] UpdateFilmeDTO filmeDTO)
+        public IActionResult UpdateFilme(int id, [FromBody] UpdateEnderecoDTO filmeDTO)
         {
             Filme filme = _context.Filme.FirstOrDefault(x => x.Id == id);
 
