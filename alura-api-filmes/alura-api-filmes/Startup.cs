@@ -1,4 +1,5 @@
 using alura_api_filmes.Data;
+using alura_api_filmes.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,6 +30,8 @@ namespace alura_api_filmes
         {
             services.AddDbContext<FilmeContext>(opts => opts.UseSqlServer(Configuration.GetConnectionString("SQL_CONNECTION")));
             services.AddDbContext<FilmeContext>(opts => opts.UseSqlServer(Configuration.GetConnectionString("SQL_CONNECTION")));
+
+            services.AddScoped<FilmeService, FilmeService>();
             services.AddControllers();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

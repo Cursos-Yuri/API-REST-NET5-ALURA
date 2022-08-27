@@ -1,7 +1,9 @@
 ﻿using alura_api_filmes.Data;
 using alura_api_filmes.Data.DTOs;
 using alura_api_filmes.Models;
+using alura_api_filmes.Services;
 using AutoMapper;
+using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,12 +15,10 @@ namespace alura_api_filmes.Controllers
     [Route("[controller]")]
     public class FilmeController : ControllerBase
     {
-        private FilmeContext _context;
-        private IMapper _mapper;
-        public FilmeController(FilmeContext context, IMapper mapper)
+        private FilmeService _filmeService;
+        public FilmeController(FilmeService filmeService)
         {
-            _context = context;
-            _mapper = mapper;
+            _filmeService = filmeService;
         }
 
         [HttpPost]
@@ -26,12 +26,9 @@ namespace alura_api_filmes.Controllers
         {
             try
             {
-                Filme filme = _mapper.Map<Filme>(filmedto);
+                ReadFilmeDTO filmeDTO = _filmeService.AdicionaFilme(filmedto);
 
-                _context.Filme.Add(filme);
-                _context.SaveChanges();
-
-                return CreatedAtAction(nameof(GetFilmePerId), new { Id = filme.Id }, filme);
+                return CreatedAtAction(nameof(GetFilmePerId), new { Id = filmeDTO.Id }, filmeDTO);
             }
             catch (Exception ex)
             {
@@ -40,11 +37,11 @@ namespace alura_api_filmes.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Filme> GetFilmes()
+        public IActionResult GetFilmes()
         {
             try
             {
-                return _context.Filme;
+                return Ok(_filmeService.RecuperarFilmes());
             }
             catch (Exception)
             {
@@ -57,9 +54,7 @@ namespace alura_api_filmes.Controllers
         {
             try
             {
-                Filme filme = _context.Filme.FirstOrDefault(x => x.Id == id);
-
-                ReadFilmeDTO filmeDto = _mapper.Map<ReadFilmeDTO>(filme);
+                ReadFilmeDTO filme =  _filmeService.RecuperarFilmePerId(id);
 
                 return Ok(filme);
             }
@@ -72,13 +67,9 @@ namespace alura_api_filmes.Controllers
         [HttpPut("{id}")]
         public IActionResult UpdateFilme(int id, [FromBody] UpdateEnderecoDTO filmeDTO)
         {
-            Filme filme = _context.Filme.FirstOrDefault(x => x.Id == id);
+            Result filme = _filmeService.AtualizarFilme(filmeDTO, id);
 
-            if (filme.Equals(null)) return NotFound();
-
-            _mapper.Map(filmeDTO, filme);
-
-            _context.SaveChanges();
+            if (filme.IsFailed) return NotFound();
 
             return NoContent();
         }
@@ -86,12 +77,9 @@ namespace alura_api_filmes.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteFilme(int id)
         {
-            Filme filme = _context.Filme.FirstOrDefault(x => x.Id == id);
-
-            if (filme.Equals(null)) return NotFound();
-
-            _context.Remove(filme);
-            _context.SaveChanges();
+            Result filme = _filmeService.DeletarFilme(id);
+            
+            if (filme.IsFailed) return NotFound();
 
             return NoContent();
         }
