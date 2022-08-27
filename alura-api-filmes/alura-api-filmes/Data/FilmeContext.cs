@@ -23,5 +23,6 @@ namespace alura_api_filmes.Data
         public DbSet<Filme> Filme { get; set; }
         public DbSet<Cinema> Cinema { get; set; }
         public DbSet<Endereco> Endereco { get; set; }
+        public DbSet<Gerente> Gerente { get; set; }
     }
 }
